@@ -1,5 +1,5 @@
 const express = require("express");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const cors = require("cors");
 const app = express();
 const port = process.env.PORT || 3000;
@@ -38,6 +38,19 @@ async function run() {
       const result = await bookCollection.insertOne(newBook);
       res.send(result);
     });
+
+    app.delete("/books/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = {
+        _id: new ObjectId(id),
+      };
+      const result = await bookCollection.deleteOne(query);
+      res.send(result);
+    });
+
+    // app.get("/books", async (req, res) => {
+    //     const
+    // });
 
     await client.db("admin").command({ ping: 1 });
     console.log("Your deployment successfully connected to MongoDB!");
