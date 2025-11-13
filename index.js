@@ -39,6 +39,18 @@ async function run() {
       res.send(result);
     });
 
+    app.patch("/books/:id", async (req, res) => {
+      const id = req.params.id;
+      const updatedBook = req.body;
+      const query = {
+        _id: new ObjectId(id),
+      };
+      const update = { $set: updatedBook };
+      const option = {};
+      const result = await bookCollection.updateOne(query, update, option);
+      res.send(result);
+    });
+
     app.delete("/books/:id", async (req, res) => {
       const id = req.params.id;
       const query = {
