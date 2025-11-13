@@ -1,4 +1,5 @@
 const express = require("express");
+require("dotenv").config();
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const cors = require("cors");
 const app = express();
@@ -10,8 +11,7 @@ app.use(express.json());
 
 // fN5nJSlPuhbTzQZu
 // TheBookHeaven
-const uri =
-  "mongodb+srv://TheBookHeaven:fN5nJSlPuhbTzQZu@module54.p4tcocf.mongodb.net/?appName=Module54";
+const uri = process.env.MONGODB_URI;
 
 const client = new MongoClient(uri, {
   serverApi: {
@@ -34,7 +34,18 @@ async function run() {
 
     //Get all books
     app.get("/books", async (req, res) => {
-      const cursor = bookCollection.find({});
+      console.log(req.query);
+      const query = {};
+      if (req.query.userEmail) query.userEmail = req.query.userEmail;
+      if (req.query.genre) query.genre = req.query.genre;
+      if (req.query.genre) query.genre = req.query.genre;
+      console.log(query);
+
+      const sortQuery = {};
+      if (req.query.sort == "asc") sortQuery.rating = 1;
+      if (req.query.sort == "dsc") sortQuery.rating = -1;
+
+      const cursor = bookCollection.find(query).sort(sortQuery);
       const result = await cursor.toArray();
       res.send(result);
     });
