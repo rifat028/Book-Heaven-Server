@@ -39,6 +39,23 @@ async function run() {
       res.send(result);
     });
 
+    //Get latest 6 books
+    app.get("/books/latest", async (req, res) => {
+      const cursor = bookCollection.find({}).sort({ _id: -1 }).limit(6);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    //Get a single book
+    app.get("/books/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = {
+        _id: new ObjectId(id),
+      };
+      const result = await bookCollection.findOne(query);
+      res.send(result);
+    });
+
     // Single Book insert
     app.post("/books", async (req, res) => {
       const newBook = req.body;
