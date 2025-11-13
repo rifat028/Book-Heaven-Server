@@ -5,6 +5,8 @@ const cors = require("cors");
 const app = express();
 const port = process.env.PORT || 3000;
 
+// const serverless = require("serverless-http");
+
 //middleware
 app.use(cors());
 app.use(express.json());
@@ -74,7 +76,7 @@ async function run() {
       res.send(result);
     });
 
-    // single uook update
+    // single book update
     app.patch("/books/:id", async (req, res) => {
       const id = req.params.id;
       const updatedBook = req.body;
@@ -97,12 +99,8 @@ async function run() {
       res.send(result);
     });
 
-    // app.get("/books", async (req, res) => {
-    //     const
-    // });
-
-    await client.db("admin").command({ ping: 1 });
-    console.log("Your deployment successfully connected to MongoDB!");
+    // await client.db("admin").command({ ping: 1 });
+    // console.log("Your deployment successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
@@ -113,3 +111,5 @@ run().catch(console.dir);
 app.listen(port, () => {
   console.log(`The Book Heaven Server Listening on port ${port}`);
 });
+// module.exports = app;
+// module.exports.handler = serverless(app);
