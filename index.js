@@ -32,6 +32,13 @@ async function run() {
     const database = client.db("bookDB");
     const bookCollection = database.collection("books");
 
+    //Get all books
+    app.get("/books", async (req, res) => {
+      const cursor = bookCollection.find({});
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
     // Single Book insert
     app.post("/books", async (req, res) => {
       const newBook = req.body;
@@ -39,6 +46,7 @@ async function run() {
       res.send(result);
     });
 
+    // single uook update
     app.patch("/books/:id", async (req, res) => {
       const id = req.params.id;
       const updatedBook = req.body;
@@ -51,6 +59,7 @@ async function run() {
       res.send(result);
     });
 
+    // single book delete
     app.delete("/books/:id", async (req, res) => {
       const id = req.params.id;
       const query = {
