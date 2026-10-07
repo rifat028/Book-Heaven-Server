@@ -1,4 +1,5 @@
 const express = require("express");
+// const serverless = require("serverless-http");
 require("dotenv").config();
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const cors = require("cors");
@@ -9,8 +10,6 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// fN5nJSlPuhbTzQZu
-// TheBookHeaven
 const uri = process.env.MONGODB_URI;
 
 const client = new MongoClient(uri, {
@@ -25,12 +24,32 @@ app.get("/", (req, res) => {
   res.send("The Book Heaven Server Running");
 });
 
+let database;
+let bookCollection;
+let bookCommentCollection;
+
 async function run() {
   try {
-    await client.connect();
+    // await client.connect();
 
     const database = client.db("bookDB");
     const bookCollection = database.collection("books");
+    const bookCommentCollection = database.collection("bookComments");
+
+    //get comments of the book
+    app.get("/comments", async (req, res) => {
+      const query = { bookID: req.query.bookID };
+      const cursor = bookCommentCollection.find(query).sort({ _id: -1 });
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    // Post a Comment
+    app.post("/comments", async (req, res) => {
+      const newComment = req.body;
+      const result = await bookCommentCollection.insertOne(newComment);
+      res.send(result);
+    });
 
     //Get all books
     app.get("/books", async (req, res) => {
@@ -45,7 +64,10 @@ async function run() {
       if (req.query.sort == "asc") sortQuery.rating = 1;
       if (req.query.sort == "dsc") sortQuery.rating = -1;
 
-      const cursor = bookCollection.find(query).sort(sortQuery);
+      const cursor = bookCollection
+        .find(query)
+        // .project({ _id: 1 })
+        .sort(sortQuery);
       const result = await cursor.toArray();
       res.send(result);
     });
@@ -74,7 +96,7 @@ async function run() {
       res.send(result);
     });
 
-    // single uook update
+    // single book update
     app.patch("/books/:id", async (req, res) => {
       const id = req.params.id;
       const updatedBook = req.body;
@@ -97,12 +119,8 @@ async function run() {
       res.send(result);
     });
 
-    // app.get("/books", async (req, res) => {
-    //     const
-    // });
-
-    await client.db("admin").command({ ping: 1 });
-    console.log("Your deployment successfully connected to MongoDB!");
+    // await client.db("admin").command({ ping: 1 });
+    // console.log("Your deployment successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
@@ -113,3 +131,5 @@ run().catch(console.dir);
 app.listen(port, () => {
   console.log(`The Book Heaven Server Listening on port ${port}`);
 });
+// module.exports = app;
+// module.exports.handler = serverless(app);
